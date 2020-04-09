@@ -16,7 +16,6 @@ class PostListView(ListView):
 def post_share(request, post_id):
     post = get_object_or_404(Post, id = post_id, status = 'published')
     sent = False
-    print('vot on object = ', post)
     if request.method == 'POST':
         form = EmailPostForm(request.POST)
         if form.is_valid():
@@ -28,7 +27,6 @@ def post_share(request, post_id):
             sent = True
     else:
         form = EmailPostForm()
-        print('This form = ', form)
     return render( request, 'post/share.html', { 'post':post, 'form':form,'sent':sent } )
 
 def post_detail(request,year,month,day,post):
