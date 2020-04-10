@@ -4,7 +4,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.views.generic import ListView
 from . forms import EmailPostForm, CommentForm
 from django.core.mail import send_mail
-
+from django.db.models import Count
 
 
 """class PostListView(ListView):
@@ -64,4 +64,7 @@ def post_detail(request,year,month,day,post):
             new_comment.save()
     else:
         comment_form = CommentForm()
-    return render(request, 'post/detail.html',{'post':post, 'comments': comments,'comment_form': comment_form})
+    post_tags_ids = post.tags.values_list('id', flat=True)
+    similar_posts = Post.objects.filter(tags__in=post_tags_ids).exclude(id=post.id)
+    similar_posts = similar_posts.annotate(same_tags=Count('tags')).order_by('-same_tags','-publish')[:2]
+    return render(request, 'post/detail.html',{'post':post, 'comments': comments,'comment_form': comment_form,'similar_posts': similar_posts})
